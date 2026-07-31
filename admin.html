@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin - Kedatangan Kursus MRSM SAS</title>
+<style>
+  :root{
+    --navy:#0b2545; --navy-2:#133a6b; --gold:#c9a227; --gold-light:#e8c766;
+    --bg:#f4f6fa; --card:#ffffff; --green:#1e8e3e; --red:#c5221f; --gray:#5f6b7a;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:#1a1a1a;}
+  .topbar{background:linear-gradient(135deg,var(--navy),var(--navy-2));padding:16px 24px;display:flex;align-items:center;gap:12px;color:#fff;box-shadow:0 4px 14px rgba(0,0,0,.15);position:sticky;top:0;z-index:10;}
+  .topbar .logo{width:40px;height:40px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;}
+  .topbar .logo img{width:100%;height:100%;object-fit:contain;}
+  .topbar h1{font-size:16px;margin:0;}
+  .topbar p{font-size:11px;margin:0;color:var(--gold-light);}
+  .topbar .spacer{flex:1;}
+  .topbar button{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.3);color:#fff;padding:7px 14px;border-radius:8px;font-size:12.5px;cursor:pointer;}
+
+  .tabs{display:flex;gap:4px;background:#fff;padding:0 16px;border-bottom:1px solid #e3e8ef;overflow-x:auto;}
+  .tab{padding:14px 16px;font-size:13.5px;font-weight:600;color:var(--gray);cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap;}
+  .tab.active{color:var(--navy);border-color:var(--gold);}
+
+  .container{max-width:1000px;margin:0 auto;padding:20px 16px 60px;}
+  .card{background:var(--card);border-radius:14px;padding:20px;box-shadow:0 4px 16px rgba(11,37,69,.08);margin-bottom:18px;}
+  .card h2{font-size:15px;margin:0 0 16px;color:var(--navy);}
+
+  label{display:block;font-size:12.5px;color:var(--gray);margin:10px 0 5px;font-weight:600;}
+  input,select{width:100%;padding:10px 12px;border:1.5px solid #dde3ec;border-radius:8px;font-size:14px;outline:none;}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  button.primary{margin-top:16px;padding:12px 20px;border:none;border-radius:9px;background:linear-gradient(135deg,var(--navy),var(--navy-2));color:#fff;font-weight:700;font-size:14px;cursor:pointer;}
+  button.ghost{padding:8px 14px;border:1.5px solid var(--navy-2);background:#fff;color:var(--navy-2);border-radius:8px;font-size:12.5px;cursor:pointer;font-weight:600;}
+  button.small-danger{padding:6px 10px;border:1px solid var(--red);background:#fff;color:var(--red);border-radius:6px;font-size:11.5px;cursor:pointer;}
+
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  th{background:#f4f6fa;color:var(--navy);text-align:left;padding:10px;font-size:11.5px;text-transform:uppercase;letter-spacing:.3px;}
+  td{padding:10px;border-bottom:1px solid #eef1f5;}
+  tr:hover td{background:#fafbfd;}
+
+  .sesi-item{border:1px solid #e3e8ef;border-radius:10px;padding:14px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap;}
+  .sesi-item .info b{color:var(--navy);font-size:14.5px;}
+  .sesi-item .info div{font-size:12px;color:var(--gray);margin-top:2px;}
+  .badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:10.5px;font-weight:700;}
+  .badge.aktif{background:#e6f4ea;color:var(--green);}
+  .badge.tutup{background:#fce8e6;color:var(--red);}
+  .actions{display:flex;gap:6px;flex-wrap:wrap;}
+
+  .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:16px;}
+  .stat-box{background:#fff;border-radius:12px;padding:16px;text-align:center;box-shadow:0 4px 14px rgba(11,37,69,.07);}
+  .stat-box .num{font-size:26px;font-weight:800;color:var(--navy);}
+  .stat-box .label{font-size:11.5px;color:var(--gray);margin-top:4px;}
+
+  #qrModal{display:none;position:fixed;inset:0;background:rgba(11,37,69,.65);align-items:center;justify-content:center;z-index:100;padding:20px;}
+  #qrModal .box{background:#fff;border-radius:16px;padding:26px;text-align:center;max-width:340px;width:100%;}
+  #qrModal img{width:220px;height:220px;margin:14px auto;}
+  #qrModal .url{font-size:11px;color:var(--gray);word-break:break-all;background:#f4f6fa;padding:8px;border-radius:6px;}
+
+  .login-wrap{max-width:340px;margin:80px auto;text-align:center;}
+  .login-wrap .logo{width:70px;height:70px;border-radius:50%;background:#fff;box-shadow:0 6px 16px rgba(11,37,69,.2);margin:0 auto 14px;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+  .login-wrap .logo img{width:100%;height:100%;object-fit:contain;}
+  .footer{text-align:center;font-size:11px;color:var(--gray);margin-top:20px;}
+  .empty{text-align:center;color:var(--gray);font-size:13px;padding:30px 0;}
+</style>
+</head>
+<body>
+
+<div id="loginScreen" class="login-wrap">
+  <div class="logo"><img src="https://drive.google.com/uc?export=view&id=12DsrwafzTvaho3ElDNP8u2FFjJF-Qo4-" onerror="this.style.display='none';this.parentElement.innerText='SAS'"></div>
+  <h2 style="color:var(--navy)">Admin - Kedatangan Kursus</h2>
+  <input type="password" id="pinInput" placeholder="Masukkan PIN Admin" style="text-align:center;font-size:16px;margin-bottom:10px;">
+  <button class="primary" style="width:100%" onclick="checkPin()">Log Masuk</button>
+  <div id="pinErr" style="color:var(--red);font-size:13px;margin-top:10px;"></div>
+  <div class="footer">Dibangunkan Oleh Unit Sains dan Unit ICT MRSM SAS 2026</div>
+</div>
+
+<div id="mainScreen" style="display:none;">
+  <div class="topbar">
+    <div class="logo"><img src="https://drive.google.com/uc?export=view&id=12DsrwafzTvaho3ElDNP8u2FFjJF-Qo4-" onerror="this.style.display='none';this.parentElement.innerText='SAS'"></div>
+    <div><h1>Sistem Kedatangan Kursus</h1><p>Panel Admin - MRSM SAS</p></div>
+    <div class="spacer"></div>
+    <button onclick="logout()">Log Keluar</button>
+  </div>
+  <div class="tabs">
+    <div class="tab active" data-tab="sesi">Urus Sesi Kursus</div>
+    <div class="tab" data-tab="dashboard">Dashboard</div>
+    <div class="tab" data-tab="rekod">Rekod Kehadiran</div>
+  </div>
+  <div class="container">
+    <div id="tab-sesi"></div>
+    <div id="tab-dashboard" style="display:none;"></div>
+    <div id="tab-rekod" style="display:none;"></div>
+    <div class="footer">Dibangunkan Oleh Unit Sains dan Unit ICT MRSM SAS 2026</div>
+  </div>
+</div>
+
+<div id="qrModal">
+  <div class="box">
+    <h3 style="color:var(--navy);margin:0 0 4px" id="qrTitle"></h3>
+    <div id="qrCanvas"></div>
+    <div class="url" id="qrUrl"></div>
+    <button class="ghost" style="margin-top:14px" onclick="document.getElementById('qrModal').style.display='none'">Tutup</button>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+<script>
+/* ============ FIREBASE CONFIG ============
+   GANTI dengan config projek Firebase anda (sama seperti index.html) */
+const firebaseConfig = {
+  apiKey: "AIzaSyDGyzgI0a3n-58SRxKGk7McEDXcnV09dAM",
+  authDomain: "ekedatangan-kursus.firebaseapp.com",
+  projectId: "ekedatangan-kursus",
+  storageBucket: "ekedatangan-kursus.firebasestorage.app",
+  messagingSenderId: "951692788792",
+  appId: "1:951692788792:web:2e9f574a30a9722866d2cd",
+  measurementId: "G-64W38QVWJE"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+/* ========================================== */
+
+// PIN admin lalai - boleh tukar terus dalam kod ini
+const DEFAULT_PIN = "SAS2026";
+const APP_BASE_URL = window.location.origin + '/index.html';
+
+function checkPin(){
+  const val = document.getElementById('pinInput').value.trim();
+  db.collection('tetapan').doc('admin').get().then(doc => {
+    const pin = doc.exists ? doc.data().pin : DEFAULT_PIN;
+    if(val === pin){
+      sessionStorage.setItem('admin_logged_in','1');
+      showMain();
+    } else {
+      document.getElementById('pinErr').innerText = "PIN salah. Sila cuba lagi.";
+    }
+  }).catch(()=>{
+    if(val === DEFAULT_PIN){
+      sessionStorage.setItem('admin_logged_in','1');
+      showMain();
+    } else {
+      document.getElementById('pinErr').innerText = "PIN salah. Sila cuba lagi.";
+    }
+  });
+}
+function logout(){ sessionStorage.removeItem('admin_logged_in'); location.reload(); }
+function showMain(){
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('mainScreen').style.display = 'block';
+  loadSesiTab();
+}
+if(sessionStorage.getItem('admin_logged_in') === '1'){ showMain(); }
+
+document.querySelectorAll('.tab').forEach(t => {
+  t.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+    document.getElementById('tab-sesi').style.display = 'none';
+    document.getElementById('tab-dashboard').style.display = 'none';
+    document.getElementById('tab-rekod').style.display = 'none';
+    document.getElementById('tab-'+t.dataset.tab).style.display = 'block';
+    if(t.dataset.tab==='sesi') loadSesiTab();
+    if(t.dataset.tab==='dashboard') loadDashboardTab();
+    if(t.dataset.tab==='rekod') loadRekodTab();
+  });
+});
+
+/* ============ TAB: URUS SESI ============ */
+function loadSesiTab(){
+  const el = document.getElementById('tab-sesi');
+  el.innerHTML = `
+    <div class="card">
+      <h2>➕ Tambah Sesi Kursus Baharu</h2>
+      <label>Tajuk Kursus</label>
+      <input id="f_tajuk" placeholder="Contoh: Kursus Kepimpinan Pelajar 2026">
+      <div class="row">
+        <div><label>Tarikh</label><input id="f_tarikh" type="date"></div>
+        <div><label>Radius Dibenarkan (meter)</label><input id="f_radius" type="number" value="100"></div>
+      </div>
+      <div class="row">
+        <div><label>Masa Mula</label><input id="f_masaMula" type="time"></div>
+        <div><label>Masa Tamat</label><input id="f_masaTamat" type="time"></div>
+      </div>
+      <div class="row">
+        <div><label>Latitud</label><input id="f_lat" type="text" placeholder="Contoh: 4.5975"></div>
+        <div><label>Longitud</label><input id="f_lng" type="text" placeholder="Contoh: 101.0901"></div>
+      </div>
+      <button class="ghost" style="margin-top:10px" onclick="gunaLokasiSemasa()">📍 Guna Lokasi GPS Semasa</button>
+      <label style="margin-top:14px;display:flex;align-items:center;gap:8px;cursor:pointer;">
+        <input type="checkbox" id="f_gpsAktif" checked style="width:auto;">
+        <span style="font-size:13.5px;color:#1a1a1a;font-weight:600;">Wajibkan Semakan GPS untuk sesi ini</span>
+      </label>
+      <div style="font-size:11.5px;color:var(--gray);margin-top:2px;">Kalau ditutup, guru boleh submit kedatangan tanpa perlu berada dalam radius lokasi.</div>
+      <div><button class="primary" onclick="tambahSesi()">Simpan Sesi Kursus</button></div>
+    </div>
+    <div class="card">
+      <h2>📋 Senarai Sesi Kursus</h2>
+      <div id="senaraiSesi"><div class="empty">Memuatkan...</div></div>
+    </div>
+  `;
+  renderSenaraiSesi();
+}
+
+function gunaLokasiSemasa(){
+  if(!navigator.geolocation){ alert("Peranti tidak menyokong GPS."); return; }
+  navigator.geolocation.getCurrentPosition(pos => {
+    document.getElementById('f_lat').value = pos.coords.latitude.toFixed(6);
+    document.getElementById('f_lng').value = pos.coords.longitude.toFixed(6);
+  }, err => alert("Gagal mengesan lokasi: " + err.message), {enableHighAccuracy:true});
+}
+
+function tambahSesi(){
+  const tajuk = document.getElementById('f_tajuk').value.trim();
+  const tarikh = document.getElementById('f_tarikh').value;
+  const masaMula = document.getElementById('f_masaMula').value;
+  const masaTamat = document.getElementById('f_masaTamat').value;
+  const lat = parseFloat(document.getElementById('f_lat').value);
+  const lng = parseFloat(document.getElementById('f_lng').value);
+  const radius = parseInt(document.getElementById('f_radius').value) || 100;
+  const gpsAktif = document.getElementById('f_gpsAktif').checked;
+
+  if(!tajuk || !tarikh || !masaMula || !masaTamat){
+    alert("Sila lengkapkan tajuk, tarikh dan masa.");
+    return;
+  }
+  if(gpsAktif && (isNaN(lat) || isNaN(lng))){
+    alert("Sila lengkapkan lokasi GPS, atau tutup suis 'Wajibkan Semakan GPS' jika tidak diperlukan.");
+    return;
+  }
+  db.collection('sesi').add({
+    tajuk, tarikh, masaMula, masaTamat,
+    lat: isNaN(lat) ? null : lat,
+    lng: isNaN(lng) ? null : lng,
+    radius, gpsAktif,
+    aktif: true,
+    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+  }).then(() => {
+    ['f_tajuk','f_tarikh','f_masaMula','f_masaTamat','f_lat','f_lng'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('f_radius').value = 100;
+    document.getElementById('f_gpsAktif').checked = true;
+    renderSenaraiSesi();
+  }).catch(err => alert("Ralat: " + err.message));
+}
+
+function renderSenaraiSesi(){
+  db.collection('sesi').orderBy('createdAt','desc').get().then(snap => {
+    const box = document.getElementById('senaraiSesi');
+    if(snap.empty){ box.innerHTML = '<div class="empty">Belum ada sesi kursus.</div>'; return; }
+    box.innerHTML = '';
+    snap.forEach(doc => {
+      const s = doc.data(); const id = doc.id;
+      box.innerHTML += `
+        <div class="sesi-item">
+          <div class="info">
+            <b>${s.tajuk}</b> ${s.aktif ? '<span class="badge aktif">AKTIF</span>' : '<span class="badge tutup">DITUTUP</span>'}
+            ${s.gpsAktif === false ? '<span class="badge tutup">GPS OFF</span>' : '<span class="badge aktif">GPS ON</span>'}
+            <div>📅 ${s.tarikh} · 🕒 ${s.masaMula}-${s.masaTamat} · 📍 Radius ${s.radius}m</div>
+          </div>
+          <div class="actions">
+            <button class="ghost" onclick="janaQR('${id}','${s.tajuk.replace(/'/g,"\\'")}')">Jana QR</button>
+            <button class="ghost" onclick="togglAktif('${id}',${!s.aktif})">${s.aktif ? 'Tutup Sesi' : 'Aktifkan'}</button>
+            <button class="ghost" onclick="togglGps('${id}',${s.gpsAktif === false ? true : false})">${s.gpsAktif === false ? 'Hidupkan GPS' : 'Matikan GPS'}</button>
+            <button class="small-danger" onclick="padamSesi('${id}')">Padam</button>
+          </div>
+        </div>`;
+    });
+  });
+}
+
+function togglAktif(id, val){
+  db.collection('sesi').doc(id).update({aktif: val}).then(renderSenaraiSesi);
+}
+function togglGps(id, val){
+  db.collection('sesi').doc(id).update({gpsAktif: val}).then(renderSenaraiSesi);
+}
+function padamSesi(id){
+  if(!confirm("Padam sesi ini? Rekod kehadiran berkaitan tidak akan dipadam.")) return;
+  db.collection('sesi').doc(id).delete().then(renderSenaraiSesi);
+}
+function janaQR(id, tajuk){
+  const url = APP_BASE_URL + '?sesi=' + id;
+  document.getElementById('qrTitle').innerText = tajuk;
+  document.getElementById('qrUrl').innerText = url;
+  const holder = document.getElementById('qrCanvas');
+  holder.innerHTML = '';
+  const canvas = document.createElement('canvas');
+  holder.appendChild(canvas);
+  document.getElementById('qrModal').style.display = 'flex';
+
+  if(typeof QRCode === 'undefined'){
+    holder.innerHTML = '<img src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=' + encodeURIComponent(url) + '" width="220" height="220" alt="QR Code">';
+    return;
+  }
+  QRCode.toCanvas(canvas, url, {width:220}, function(err){
+    if(err){
+      holder.innerHTML = '<img src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=' + encodeURIComponent(url) + '" width="220" height="220" alt="QR Code">';
+    }
+  });
+}
+
+/* ============ TAB: DASHBOARD ============ */
+function loadDashboardTab(){
+  const el = document.getElementById('tab-dashboard');
+  el.innerHTML = `<div class="card"><label>Pilih Sesi</label><select id="dashSesi"></select></div><div id="dashStats"></div>`;
+  db.collection('sesi').orderBy('createdAt','desc').get().then(snap => {
+    const sel = document.getElementById('dashSesi');
+    sel.innerHTML = '';
+    snap.forEach(doc => {
+      const opt = document.createElement('option');
+      opt.value = doc.id; opt.innerText = doc.data().tajuk + ' (' + doc.data().tarikh + ')';
+      sel.appendChild(opt);
+    });
+    if(!snap.empty){
+      renderDashStats(sel.value);
+      sel.addEventListener('change', () => renderDashStats(sel.value));
+    } else {
+      document.getElementById('dashStats').innerHTML = '<div class="empty">Belum ada sesi kursus.</div>';
+    }
+  });
+}
+function renderDashStats(sesiId){
+  db.collection('kehadiran').where('sesiId','==',sesiId).get().then(snap => {
+    const total = snap.size;
+    let dalamRadius = 0;
+    snap.forEach(d => { if((d.data().jarak||0) <= 100000) dalamRadius++; }); // semua rekod yg lulus semasa submit
+    document.getElementById('dashStats').innerHTML = `
+      <div class="stat-grid">
+        <div class="stat-box"><div class="num">${total}</div><div class="label">Jumlah Hadir</div></div>
+        <div class="stat-box"><div class="num">${new Date().toLocaleDateString('ms-MY')}</div><div class="label">Tarikh Semasa</div></div>
+      </div>
+      <div class="card"><h2>Kemaskini Masa Nyata</h2><p style="font-size:13px;color:var(--gray)">Dashboard ini mengira semula setiap kali sesi ditukar. Untuk senarai penuh, lihat tab "Rekod Kehadiran".</p></div>
+    `;
+  });
+}
+
+/* ============ TAB: REKOD KEHADIRAN ============ */
+function loadRekodTab(){
+  const el = document.getElementById('tab-rekod');
+  el.innerHTML = `
+    <div class="card">
+      <div class="row">
+        <div><label>Pilih Sesi</label><select id="rekodSesi"></select></div>
+        <div><label>Cari No. Gaji / Nama</label><input id="rekodSearch" placeholder="Taip untuk cari..."></div>
+      </div>
+      <button class="ghost" style="margin-top:10px" onclick="exportCSV()">⬇ Eksport CSV</button>
+    </div>
+    <div class="card">
+      <table>
+        <thead><tr><th>#</th><th>No. Gaji</th><th>Nama</th><th>Masa Rekod</th><th>Jarak</th></tr></thead>
+        <tbody id="rekodBody"><tr><td colspan="5" class="empty">Memuatkan...</td></tr></tbody>
+      </table>
+    </div>
+  `;
+  db.collection('sesi').orderBy('createdAt','desc').get().then(snap => {
+    const sel = document.getElementById('rekodSesi');
+    sel.innerHTML = '';
+    snap.forEach(doc => {
+      const opt = document.createElement('option');
+      opt.value = doc.id; opt.innerText = doc.data().tajuk + ' (' + doc.data().tarikh + ')';
+      sel.appendChild(opt);
+    });
+    if(!snap.empty){
+      renderRekod(sel.value);
+      sel.addEventListener('change', () => renderRekod(sel.value));
+      document.getElementById('rekodSearch').addEventListener('input', () => renderRekod(sel.value));
+    } else {
+      document.getElementById('rekodBody').innerHTML = '<tr><td colspan="5" class="empty">Belum ada sesi kursus.</td></tr>';
+    }
+  });
+}
+let _rekodCache = [];
+function renderRekod(sesiId){
+  db.collection('kehadiran').where('sesiId','==',sesiId).get().then(snap => {
+    _rekodCache = [];
+    snap.forEach(d => _rekodCache.push(d.data()));
+    _rekodCache.sort((a,b) => (a.masaPaparan||'').localeCompare(b.masaPaparan||''));
+    drawRekodTable();
+  });
+}
+function drawRekodTable(){
+  const search = (document.getElementById('rekodSearch').value || '').toLowerCase();
+  const filtered = _rekodCache.filter(r =>
+    (r.noGaji||'').toLowerCase().includes(search) || (r.nama||'').toLowerCase().includes(search)
+  );
+  const body = document.getElementById('rekodBody');
+  if(filtered.length === 0){ body.innerHTML = '<tr><td colspan="5" class="empty">Tiada rekod.</td></tr>'; return; }
+  body.innerHTML = filtered.map((r,i) => `
+    <tr><td>${i+1}</td><td>${r.noGaji}</td><td>${r.nama}</td><td>${r.masaPaparan||'-'}</td><td>${(r.jarak===null||r.jarak===undefined) ? '-' : r.jarak+'m'}</td></tr>
+  `).join('');
+}
+function exportCSV(){
+  if(_rekodCache.length === 0){ alert("Tiada data untuk dieksport."); return; }
+  let csv = "No Gaji,Nama,Masa Rekod,Jarak (m)\n";
+  _rekodCache.forEach(r => { csv += `${r.noGaji},"${r.nama}",${r.masaPaparan},${r.jarak}\n`; });
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = 'rekod_kehadiran.csv';
+  link.click();
+}
+</script>
+</body>
+</html>

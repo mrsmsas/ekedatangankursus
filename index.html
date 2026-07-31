@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Kedatangan Kursus - MRSM SAS</title>
+<link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiZUtlaGFkaXJhbiIsInNob3J0X25hbWUiOiJlS2VoYWRpcmFuIiwic3RhcnRfdXJsIjoiLiIsImRpc3BsYXkiOiJzdGFuZGFsb25lIn0=">
+<style>
+  :root{
+    --navy:#0b2545;
+    --navy-2:#133a6b;
+    --gold:#c9a227;
+    --gold-light:#e8c766;
+    --bg:#f4f6fa;
+    --card:#ffffff;
+    --green:#1e8e3e;
+    --red:#c5221f;
+    --gray:#5f6b7a;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Segoe UI',Arial,sans-serif;
+    background:linear-gradient(180deg,var(--navy) 0%, var(--navy-2) 220px, var(--bg) 220px);
+    min-height:100vh;
+    color:#1a1a1a;
+  }
+  .wrap{max-width:480px;margin:0 auto;padding:20px 16px 60px;}
+  .header{text-align:center;padding:18px 0 10px;}
+  .logo{width:64px;height:64px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;box-shadow:0 4px 14px rgba(0,0,0,.25);font-weight:800;color:var(--navy);font-size:11px;text-align:center;overflow:hidden;}
+  .logo img{width:100%;height:100%;object-fit:contain;}
+  .header h1{color:#fff;font-size:19px;margin:0;letter-spacing:.3px;}
+  .header p{color:var(--gold-light);font-size:12.5px;margin:4px 0 0;}
+
+  .card{background:var(--card);border-radius:14px;padding:20px;box-shadow:0 8px 24px rgba(11,37,69,.10);margin-top:16px;}
+  .card h2{font-size:15px;margin:0 0 14px;color:var(--navy);display:flex;align-items:center;gap:8px;}
+  .card h2 .dot{width:8px;height:8px;border-radius:50%;background:var(--gold);}
+
+  .kursus-title{font-size:20px;font-weight:700;color:var(--navy);margin:0 0 6px;}
+  .kursus-meta{font-size:13px;color:var(--gray);margin:2px 0;display:flex;gap:8px;align-items:center;}
+  .badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11.5px;font-weight:600;}
+  .badge.aktif{background:#e6f4ea;color:var(--green);}
+  .badge.tutup{background:#fce8e6;color:var(--red);}
+
+  label{display:block;font-size:12.5px;color:var(--gray);margin:12px 0 5px;font-weight:600;}
+  input{width:100%;padding:12px 14px;border:1.5px solid #dde3ec;border-radius:9px;font-size:15px;outline:none;transition:border .15s;}
+  input:focus{border-color:var(--navy-2);}
+
+  .gps-box{margin-top:14px;padding:12px 14px;border-radius:10px;font-size:13px;display:flex;gap:10px;align-items:flex-start;}
+  .gps-ok{background:#e6f4ea;color:#155724;}
+  .gps-bad{background:#fce8e6;color:#7a1712;}
+  .gps-wait{background:#fff8e1;color:#8a6d00;}
+
+  button.main{
+    width:100%;margin-top:18px;padding:15px;border:none;border-radius:10px;
+    background:linear-gradient(135deg,var(--navy),var(--navy-2));color:#fff;font-size:16px;font-weight:700;
+    letter-spacing:.3px;cursor:pointer;box-shadow:0 6px 16px rgba(11,37,69,.25);
+  }
+  button.main:disabled{background:#b7bfca;box-shadow:none;cursor:not-allowed;}
+  button.secondary{width:100%;margin-top:10px;padding:12px;border:1.5px solid var(--navy-2);background:#fff;color:var(--navy-2);border-radius:9px;font-weight:600;font-size:14px;cursor:pointer;}
+
+  .success{
+    text-align:center;padding:30px 10px;
+  }
+  .success .check{width:70px;height:70px;border-radius:50%;background:#e6f4ea;color:var(--green);font-size:38px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;}
+  .success h2{color:var(--navy);margin:0 0 6px;}
+  .success p{color:var(--gray);font-size:13.5px;}
+
+  .footer{text-align:center;font-size:11px;color:var(--gray);margin-top:26px;}
+  .msg-error{background:#fce8e6;color:var(--red);padding:12px 14px;border-radius:9px;font-size:13.5px;margin-top:14px;}
+  .spinner{width:34px;height:34px;border:4px solid #dde3ec;border-top-color:var(--navy-2);border-radius:50%;animation:spin 0.8s linear infinite;margin:20px auto;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .center-text{text-align:center;color:var(--gray);font-size:13.5px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="header">
+    <div class="logo"><img src="https://drive.google.com/uc?export=view&id=12DsrwafzTvaho3ElDNP8u2FFjJF-Qo4-" onerror="this.style.display='none';this.parentElement.innerText='MRSM SAS'"></div>
+    <h1>Sistem Kedatangan Kursus</h1>
+    <p>MRSM Sultan Azlan Shah</p>
+  </div>
+
+  <div id="app"></div>
+
+  <div class="footer">Dibangunkan Oleh Unit Sains dan Unit ICT MRSM SAS 2026</div>
+</div>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script>
+/* ============ FIREBASE CONFIG ============
+   GANTI bahagian ini dengan config projek Firebase anda sendiri
+   (Firebase Console > Project Settings > General > Your apps > SDK setup) */
+const firebaseConfig = {
+  apiKey: "AIzaSyDGyzgI0a3n-58SRxKGk7McEDXcnV09dAM",
+  authDomain: "ekedatangan-kursus.firebaseapp.com",
+  projectId: "ekedatangan-kursus",
+  storageBucket: "ekedatangan-kursus.firebasestorage.app",
+  messagingSenderId: "951692788792",
+  appId: "1:951692788792:web:2e9f574a30a9722866d2cd",
+  measurementId: "G-64W38QVWJE"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+/* ========================================== */
+
+const app = document.getElementById('app');
+const params = new URLSearchParams(window.location.search);
+const sesiId = params.get('sesi');
+
+function haversine(lat1, lon1, lat2, lon2){
+  const R = 6371000;
+  const toRad = x => x * Math.PI / 180;
+  const dLat = toRad(lat2-lat1);
+  const dLon = toRad(lon2-lon1);
+  const a = Math.sin(dLat/2)**2 + Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*Math.sin(dLon/2)**2;
+  const c = 2*Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  return R*c;
+}
+
+function renderError(msg){
+  app.innerHTML = `<div class="card"><div class="msg-error">${msg}</div></div>`;
+}
+
+if(!sesiId){
+  renderError("Kod QR tidak sah. Sila imbas semula QR kursus yang disediakan oleh admin.");
+} else {
+  app.innerHTML = `<div class="card"><div class="spinner"></div><p class="center-text">Memuatkan maklumat kursus...</p></div>`;
+
+  db.collection('sesi').doc(sesiId).get().then(doc => {
+    if(!doc.exists){
+      renderError("Sesi kursus tidak dijumpai. Sila hubungi admin.");
+      return;
+    }
+    const sesi = doc.data();
+    initForm(sesi);
+  }).catch(err => {
+    renderError("Ralat menyambung ke pangkalan data. Sila semak internet anda.<br><small>" + err.message + "</small>");
+  });
+}
+
+function initForm(sesi){
+  const savedKey = 'kedatangan_' + sesiId;
+  const already = sessionStorage.getItem(savedKey);
+
+  app.innerHTML = `
+    <div class="card">
+      <h2><span class="dot"></span>Maklumat Kursus</h2>
+      <div class="kursus-title">${sesi.tajuk}</div>
+      <div class="kursus-meta">📅 ${sesi.tarikh}</div>
+      <div class="kursus-meta">🕒 ${sesi.masaMula} - ${sesi.masaTamat}</div>
+      <div class="kursus-meta">${sesi.aktif ? '<span class="badge aktif">SESI AKTIF</span>' : '<span class="badge tutup">SESI DITUTUP</span>'}</div>
+    </div>
+
+    <div class="card" id="loginCard">
+      <h2><span class="dot"></span>Log Masuk & Kedatangan</h2>
+      <label>No. Gaji</label>
+      <input type="text" id="noGaji" placeholder="Contoh: 123456" inputmode="numeric">
+      <label>Nama Penuh</label>
+      <input type="text" id="nama" placeholder="Nama seperti dalam rekod rasmi">
+      <div id="gpsBox" class="gps-box gps-wait">📍 Mengesan lokasi GPS anda...</div>
+      <button class="main" id="btnHadir" disabled>Semak Lokasi...</button>
+      <div id="errBox"></div>
+    </div>
+  `;
+
+  if(already){
+    app.innerHTML = `
+      <div class="card">
+        <div class="success">
+          <div class="check">✓</div>
+          <h2>Kedatangan Direkodkan</h2>
+          <p>${JSON.parse(already).nama} (${JSON.parse(already).noGaji})<br>telah direkodkan hadir pada ${JSON.parse(already).masa}</p>
+        </div>
+      </div>`;
+    return;
+  }
+
+  if(!sesi.aktif){
+    document.getElementById('loginCard').innerHTML = `<div class="msg-error">Sesi kursus ini belum/tidak lagi aktif. Sila hubungi admin.</div>`;
+    return;
+  }
+
+  let currentPos = null;
+  const gpsWajib = sesi.gpsAktif !== false;
+
+  const gpsBox = document.getElementById('gpsBox');
+  const btn = document.getElementById('btnHadir');
+
+  function updateButtonState(){
+    const noGaji = document.getElementById('noGaji').value.trim();
+    const nama = document.getElementById('nama').value.trim();
+    if(gpsWajib){
+      if(!currentPos){ btn.disabled = true; btn.innerText = "Menunggu GPS..."; return; }
+      if(currentPos.dist > sesi.radius){
+        btn.disabled = true; btn.innerText = "Di Luar Kawasan Kursus"; return;
+      }
+    }
+    if(!noGaji || !nama){ btn.disabled = true; btn.innerText = "Isi No. Gaji & Nama"; return; }
+    btn.disabled = false; btn.innerText = "✓ Hadir";
+  }
+
+  document.getElementById('noGaji').addEventListener('input', updateButtonState);
+  document.getElementById('nama').addEventListener('input', updateButtonState);
+
+  if(!gpsWajib){
+    gpsBox.className = 'gps-box gps-ok';
+    gpsBox.innerHTML = '📍 Semakan GPS tidak diwajibkan untuk sesi ini.';
+    updateButtonState();
+    // Cuba kesan lokasi secara senyap (untuk rekod sahaja, tidak menyekat butang)
+    if(navigator.geolocation){
+      navigator.geolocation.getCurrentPosition(pos => {
+        currentPos = {lat: pos.coords.latitude, lng: pos.coords.longitude, dist: Math.round(haversine(pos.coords.latitude, pos.coords.longitude, sesi.lat||0, sesi.lng||0))};
+      }, () => {}, {enableHighAccuracy:true, timeout:8000});
+    }
+  } else if(!navigator.geolocation){
+    gpsBox.className = 'gps-box gps-bad';
+    gpsBox.innerText = '⚠ Peranti anda tidak menyokong GPS.';
+  } else {
+    navigator.geolocation.getCurrentPosition(pos => {
+      const lat = pos.coords.latitude, lng = pos.coords.longitude;
+      const dist = Math.round(haversine(lat, lng, sesi.lat, sesi.lng));
+      currentPos = {lat, lng, dist};
+      if(dist <= sesi.radius){
+        gpsBox.className = 'gps-box gps-ok';
+        gpsBox.innerHTML = `✅ Lokasi disahkan (${dist}m dari lokasi kursus)`;
+      } else {
+        gpsBox.className = 'gps-box gps-bad';
+        gpsBox.innerHTML = `❌ Anda berada ${dist}m dari lokasi kursus (had dibenarkan: ${sesi.radius}m)`;
+      }
+      updateButtonState();
+    }, err => {
+      gpsBox.className = 'gps-box gps-bad';
+      gpsBox.innerHTML = '⚠ Gagal mengesan lokasi. Sila benarkan akses GPS dan cuba lagi.';
+      btn.innerText = "Cuba Lagi";
+      btn.disabled = false;
+      btn.onclick = () => location.reload();
+    }, {enableHighAccuracy:true, timeout:15000});
+  }
+
+  btn.addEventListener('click', () => {
+    if(btn.innerText === "Cuba Lagi"){ location.reload(); return; }
+    const noGaji = document.getElementById('noGaji').value.trim();
+    const nama = document.getElementById('nama').value.trim();
+    btn.disabled = true;
+    btn.innerText = "Menyimpan...";
+
+    // Semak jika sudah hadir (elak duplikasi)
+    db.collection('kehadiran').where('sesiId','==',sesiId).where('noGaji','==',noGaji).get().then(snap => {
+      if(!snap.empty){
+        document.getElementById('errBox').innerHTML = `<div class="msg-error">No. Gaji ini sudah direkodkan hadir untuk sesi ini.</div>`;
+        btn.innerText = "Sudah Direkodkan";
+        return;
+      }
+      const now = new Date();
+      const masaStr = now.toLocaleString('ms-MY', {dateStyle:'medium', timeStyle:'short'});
+      return db.collection('kehadiran').add({
+        sesiId: sesiId,
+        tajukKursus: sesi.tajuk,
+        noGaji: noGaji,
+        nama: nama,
+        lat: currentPos ? currentPos.lat : null,
+        lng: currentPos ? currentPos.lng : null,
+        jarak: currentPos ? currentPos.dist : null,
+        masa: firebase.firestore.FieldValue.serverTimestamp(),
+        masaPaparan: masaStr
+      }).then(() => {
+        sessionStorage.setItem(savedKey, JSON.stringify({noGaji, nama, masa: masaStr}));
+        app.innerHTML = `
+          <div class="card">
+            <div class="success">
+              <div class="check">✓</div>
+              <h2>Kedatangan Direkodkan</h2>
+              <p>${nama} (${noGaji})<br>telah direkodkan hadir pada ${masaStr}</p>
+            </div>
+          </div>`;
+      });
+    }).catch(err => {
+      document.getElementById('errBox').innerHTML = `<div class="msg-error">Ralat menyimpan data: ${err.message}</div>`;
+      btn.disabled = false;
+      btn.innerText = "✓ Hadir";
+    });
+  });
+}
+</script>
+</body>
+</html>
