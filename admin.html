@@ -125,7 +125,7 @@ const db = firebase.firestore();
 
 // PIN admin lalai - boleh tukar terus dalam kod ini
 const DEFAULT_PIN = "SAS2026";
-const APP_BASE_URL = window.location.origin + '/index.html';
+const APP_BASE_URL = window.location.origin + window.location.pathname.replace(/[^\/]*$/, '') + 'index.html';
 
 function checkPin(){
   const val = document.getElementById('pinInput').value.trim();
