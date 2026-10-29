@@ -100,7 +100,11 @@
     <h3 style="color:var(--navy);margin:0 0 4px" id="qrTitle"></h3>
     <div id="qrCanvas"></div>
     <div class="url" id="qrUrl"></div>
-    <button class="ghost" style="margin-top:14px" onclick="document.getElementById('qrModal').style.display='none'">Tutup</button>
+    <div style="display:flex;gap:8px;margin-top:14px;justify-content:center;flex-wrap:wrap">
+      <button class="primary" style="width:auto;padding:10px 16px" onclick="muatTurunQR()">Muat Turun</button>
+      <button class="primary" style="width:auto;padding:10px 16px" onclick="cetakQR()">Cetak</button>
+      <button class="ghost" style="width:auto" onclick="document.getElementById('qrModal').style.display='none'">Tutup</button>
+    </div>
   </div>
 </div>
 
@@ -280,8 +284,57 @@ function padamSesi(id){
   if(!confirm("Padam sesi ini? Rekod kehadiran berkaitan tidak akan dipadam.")) return;
   db.collection('sesi').doc(id).delete().then(renderSenaraiSesi);
 }
+function binaQRGambar(cb){
+  const d = window._qrSemasa;
+  if(!d){ return; }
+  if(typeof QRCode === 'undefined'){ alert('Pustaka QR tidak dimuatkan. Semak sambungan internet dan cuba lagi.'); return; }
+  const qr = document.createElement('canvas');
+  QRCode.toCanvas(qr, d.url, {width:900, margin:2}, function(err){
+    if(err){ alert('Gagal menjana QR.'); return; }
+    const W = 1000, pad = 50, FONT = "'Segoe UI', Arial, sans-serif";
+    const c = document.createElement('canvas');
+    const mctx = c.getContext('2d');
+    mctx.font = 'bold 44px ' + FONT;
+    const lines = []; let cur = '';
+    String(d.tajuk || '').split(' ').forEach(function(w){
+      const tt = cur ? cur + ' ' + w : w;
+      if(mctx.measureText(tt).width > W - 2*pad && cur){ lines.push(cur); cur = w; } else { cur = tt; }
+    });
+    if(cur) lines.push(cur);
+    const titleH = lines.length * 56 + 20;
+    c.width = W; c.height = pad + titleH + 900 + 90 + pad;
+    const ctx = c.getContext('2d');
+    ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, c.width, c.height);
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#0b2545'; ctx.font = 'bold 44px ' + FONT;
+    lines.forEach(function(l, i){ ctx.fillText(l, W/2, pad + 44 + i*56); });
+    ctx.drawImage(qr, (W - 900)/2, pad + titleH, 900, 900);
+    ctx.fillStyle = '#5f6b7a'; ctx.font = '26px ' + FONT;
+    ctx.fillText('Imbas QR untuk merekod kehadiran', W/2, pad + titleH + 900 + 50);
+    cb(c);
+  });
+}
+function muatTurunQR(){
+  binaQRGambar(function(c){
+    const nama = String((window._qrSemasa && window._qrSemasa.tajuk) || 'sesi').replace(/[^a-z0-9]+/gi, '-').replace(/^-+|-+$/g, '').slice(0, 60) || 'sesi';
+    const a = document.createElement('a');
+    a.href = c.toDataURL('image/png');
+    a.download = 'QR-' + nama + '.png';
+    document.body.appendChild(a); a.click(); a.remove();
+  });
+}
+function cetakQR(){
+  binaQRGambar(function(c){
+    const w = window.open('', '_blank');
+    if(!w){ alert('Pop-up disekat. Benarkan pop-up atau guna Muat Turun.'); return; }
+    w.document.write('<!doctype html><html><head><meta charset="UTF-8"><title>Cetak QR</title><style>@page{margin:10mm}body{margin:0;text-align:center}img{max-width:100%;max-height:100vh}</style></head><body><img src="' + c.toDataURL('image/png') + '"></body></html>');
+    w.document.close();
+    setTimeout(function(){ w.focus(); w.print(); }, 400);
+  });
+}
 function janaQR(id, tajuk){
   const url = APP_BASE_URL + '?sesi=' + id;
+  window._qrSemasa = {url: url, tajuk: tajuk};
   document.getElementById('qrTitle').innerText = tajuk;
   document.getElementById('qrUrl').innerText = url;
   const holder = document.getElementById('qrCanvas');
